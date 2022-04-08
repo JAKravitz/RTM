@@ -67,8 +67,12 @@ def build_Case2(phy_library, datamin, datadet, benthic_lib, adj_lib, aero_lib):
     min_frxn = {run_mins[0]+'1': fx,
                 run_mins[1]+'2': 1-fx}
         
-    sigma,scale = lognorm_params(.5,500)
-    napData = lognorm_random(sigma, scale, 20000)  
+    sigma,scale = lognorm_params(.5,10)
+    napData = lognorm_random(sigma, scale, 20000) 
+    napData = napData[napData < 60]
+    plt.hist(napData, bins=500)
+    plt.xlim(0,100)
+    
     nap = round(np.random.choice(napData), 3)
     sf = np.random.choice(np.linspace(.6, .95, 50))
     minl = nap * sf
@@ -88,9 +92,12 @@ def build_Case2(phy_library, datamin, datadet, benthic_lib, adj_lib, aero_lib):
 
 ##################### CDOM ######################################################
 #%
-    sigma,scale = lognorm_params(.2,20)
+    sigma,scale = lognorm_params(.5,5)
     domData = lognorm_random(sigma, scale, 20000)  
-    domData = domData[domData < 200]
+    domData = domData[domData < 50]
+    plt.hist(domData, bins=500)
+    plt.xlim(0,60)
+    
     ag440 = round(np.random.choice(domData), 3)
     cdomIOPs = cdom_iops(ag440)
     iops['CDOM'] = cdomIOPs
