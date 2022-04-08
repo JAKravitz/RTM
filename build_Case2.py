@@ -149,13 +149,22 @@ def build_Case2(phy_library, datamin, datadet, benthic_lib, adj_lib, aero_lib):
     iops['Adjacency']['dist'] = .1
     
     
+    
 #################### ATMOSPHERE ################################################
 #%  
     atm =  {'aero': aero_lib.sample(),
             'atm_prof': np.random.choice(['afglt','afglms','afglmw','afglss','afglsw',
                                          'afglus']),
+            'aero_prof': np.random.choice(['antarctic', 'continental_average',
+                                          'continental_clean', 'continental_polluted',
+                                          'desert', 'desert_spheroids',
+                                          'maritime_clean', 'maritime_polluted',
+                                          'maritime_tropical', 'urban']),
             'VZA': np.random.choice(range(10,50)),
             'VAA': np.random.choice(range(60,120))}
+    
+    # add altitude, water vapor, ozone, wind (for sunglint) !!!!!
+    
     iops['Atm'] = atm
     
     return iops
