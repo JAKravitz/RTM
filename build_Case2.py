@@ -17,6 +17,18 @@ def build_Case2(phy_library, datamin, datadet, benthic_lib, adj_lib, aero_lib):
     # initiate dictionary
     iops = {}
     
+    # VSF angles
+    theta901 = np.arange(0, 90.1, 0.1) # length 901
+    nang=901
+    angles=np.cos(np.deg2rad(theta901)) # length 901
+    theta1 = np.deg2rad(theta901) 
+    theta2 = np.flipud(np.pi-np.deg2rad(theta901[0:900]))
+    theta=np.append(theta1,theta2)
+    iops['VSF_angles'] = np.rad2deg(theta)
+    
+    # lambda
+    iops['lambda'] = np.arange(.4, .9025, .0025).astype(np.float32) 
+    
 #################### PHYTOPLANKTON ##############################################    
     
     # assign class contributions
@@ -99,7 +111,10 @@ def build_Case2(phy_library, datamin, datadet, benthic_lib, adj_lib, aero_lib):
         y = c * np.exp(-slope*-k)
         x = y/c
         yfactor.append(y)
-        xfactor.append(x)
+        if k == 0:
+            xfactor.append(0)
+        else:
+            xfactor.append(x)
     
     dprops = {'Depth':d,
               'xfactor':xfactor,

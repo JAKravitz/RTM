@@ -10,10 +10,42 @@ import pandas as pd
 from luts.luts import LUT, MLUT, Idx, merge, read_mlut
 from smartg.tools.phase import integ_phase
 from smartg.albedo import Albedo_cst
-from smartg.water import IOP 
+from smartg.water import IOP
+from scipy.interpolate import interp1d
+from smartg.tools.phase import integ_phase, calc_iphase
 
 WAV = np.linspace(400, 900., num=201, dtype=np.float32)
 WAV_CDOM = np.arange(240., 900., 2.5, dtype=np.float32)
+
+class Albedo_speclib2(object):
+    '''
+    Albedo from speclib
+    (http://speclib.jpl.nasa.gov/)
+    '''
+    def __init__(self, df):
+        # data = np.genfromtxt(filename, skip_header=26)
+        # convert X axis from micrometers to nm
+        # convert Y axis from percent to dimensionless
+        l = [df.index.values.astype(np.float32)]
+        r = df.values
+        self.data = LUT(r, axes=l, names=['wavelength'])
+
+    def get(self, wl):
+        return self.data[Idx(wl)]
+
+class Albedo_spectrum2(object):
+    '''
+    Albedo R(lambda)
+
+    R spectral albedo, lam in nm
+    '''
+    def __init__(self, df):
+        l = [df.index.values.astype(np.float32)]
+        r = df.values / 100
+        self.data = LUT(r, axes=l, names=['wavelength'])
+
+    def get(self, wl):
+        return self.data[Idx(wl)]
 
 def norm_vsf(vsf, angles):
     '''
@@ -141,15 +173,16 @@ def mix(runData):
     ac  = np.zeros_like(WAV)
     bp  = np.zeros_like(WAV)
     vsf = np.zeros((1,WAV.size,1801), dtype=np.float32)
+    angles = runData['VSF_angles']
     for key in runData.keys():
         comp = runData[key]
-        if 'b_tot' in comp.keys():
+        if key in ['Phyto','Min','Det']:
             ap += comp['a_tot']
             bp += comp['b_tot']
             vsf+= comp['b_tot'][None,:,None] * comp['VSF_tot']
-        else:
+        elif key in ['CDOM']:
             ac += interp1d(WAV_CDOM, comp['a_tot'], kind='cubic', fill_value='extrapolate')(WAV)
-        if 'VSF_angles' in comp.keys():
-            angles = comp['VSF_angles']
+        # if 'VSF_angles' in comp.keys():
+        #     angles = comp['VSF_angles']
             
     return ap,ac,bp,vsf/bp[None,:,None],angles
