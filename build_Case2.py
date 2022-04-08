@@ -136,6 +136,12 @@ def build_Case2(phy_library, datamin, datadet, benthic_lib, adj_lib, aero_lib):
     adj_frxn = dirichlet_adj(alphas,groups,adj_lib)
     iops['Adjacency'] = adj_frxn 
 
+    # water body radius (km)
+    iops['Adjacency']['water_radius'] = 5 
+    # Distance to landline
+    iops['Adjacency']['dist'] = .1
+    
+    
 #################### ATMOSPHERE ################################################
 #%  
     atm =  {'aero': aero_lib.sample(),

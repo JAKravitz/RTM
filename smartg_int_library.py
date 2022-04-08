@@ -27,7 +27,7 @@ class Albedo_speclib2(object):
         # convert X axis from micrometers to nm
         # convert Y axis from percent to dimensionless
         l = [df.index.values.astype(np.float32)]
-        r = df.values
+        r = df.values / 100
         self.data = LUT(r, axes=l, names=['wavelength'])
 
     def get(self, wl):
@@ -41,7 +41,7 @@ class Albedo_spectrum2(object):
     '''
     def __init__(self, df):
         l = [df.index.values.astype(np.float32)]
-        r = df.values / 100
+        r = df.values 
         self.data = LUT(r, axes=l, names=['wavelength'])
 
     def get(self, wl):
