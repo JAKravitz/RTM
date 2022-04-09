@@ -1,7 +1,7 @@
-%pylab inline
+# %pylab inline
 # next 2 lines allow to automatically reload modules that have been changed externally
-%reload_ext autoreload
-%autoreload 2
+# %reload_ext autoreload
+# %autoreload 2
 import os, sys
 sys.path.insert(0, '/nobackup/jakravit/smartg-dev/smartg/')
 from luts.luts import LUT, MLUT, Idx, merge, read_mlut
