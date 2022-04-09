@@ -465,7 +465,7 @@ def col_name_append(name):
     return l3
 
 ##
-def dict_to_df (iops, k):
+def dict_to_df (iops):
     tots = ['TotChl','TotPC','class_chl','class_frxn','class_Deff','class_sz_class',
             'Tot_conc','Tot_slope','S240_700', 
             'S275_295', 'S300_700', 'S350_400', 'S350_550',
@@ -585,6 +585,9 @@ def dict_to_df (iops, k):
             d = k.values
             row.append(d)
             col_names.append(col_name_append('adj_tot_'))
+        elif i in ['water_radius','dist']:
+            row.append(k)
+            col_names.append(i)
         else:
             d = k['gfx']
             row.append(d)
@@ -601,11 +604,11 @@ def dict_to_df (iops, k):
 
 
     col_names_final = np.hstack(col_names)
-    final = np.hstack((row))    
+    row_final = np.hstack((row))    
     
-    df = pd.Series(final, index=col_names_final)
+    # df = pd.Series(final, index=col_names_final)
     
-    return df
+    return col_names_final, row_final
 
 
 

@@ -70,8 +70,8 @@ def build_Case2(phy_library, datamin, datadet, benthic_lib, adj_lib, aero_lib):
     sigma,scale = lognorm_params(.5,10)
     napData = lognorm_random(sigma, scale, 20000) 
     napData = napData[napData < 60]
-    plt.hist(napData, bins=500)
-    plt.xlim(0,100)
+    # plt.hist(napData, bins=500)
+    # plt.xlim(0,100)
     
     nap = round(np.random.choice(napData), 3)
     sf = np.random.choice(np.linspace(.6, .95, 50))
@@ -95,8 +95,8 @@ def build_Case2(phy_library, datamin, datadet, benthic_lib, adj_lib, aero_lib):
     sigma,scale = lognorm_params(.5,5)
     domData = lognorm_random(sigma, scale, 20000)  
     domData = domData[domData < 50]
-    plt.hist(domData, bins=500)
-    plt.xlim(0,60)
+    # plt.hist(domData, bins=500)
+    # plt.xlim(0,60)
     
     ag440 = round(np.random.choice(domData), 3)
     cdomIOPs = cdom_iops(ag440)
@@ -142,11 +142,14 @@ def build_Case2(phy_library, datamin, datadet, benthic_lib, adj_lib, aero_lib):
     groups = ['Ice','Manmade','Non-photo Veg','Soil','Vegetation']
     adj_frxn = dirichlet_adj(alphas,groups,adj_lib)
     iops['Adjacency'] = adj_frxn 
-
+    
+    # small water bodies
+    wr = np.random.choice(np.arange(1,25,1))
+    dist = np.random.choice(np.arange(.1, 25/2, .2).astype(np.float16))
     # water body radius (km)
-    iops['Adjacency']['water_radius'] = 5 
+    iops['Adjacency']['water_radius'] = wr
     # Distance to landline
-    iops['Adjacency']['dist'] = .1
+    iops['Adjacency']['dist'] = dist
     
     
     
@@ -157,14 +160,20 @@ def build_Case2(phy_library, datamin, datadet, benthic_lib, adj_lib, aero_lib):
                                          'afglus']),
             'aero_prof': np.random.choice(['antarctic', 'continental_average',
                                           'continental_clean', 'continental_polluted',
-                                          'desert', 'desert_spheroids',
+                                          'desert',
                                           'maritime_clean', 'maritime_polluted',
                                           'maritime_tropical', 'urban']),
             'VZA': np.random.choice(range(10,50)),
-            'VAA': np.random.choice(range(60,120))}
+            'VAA': np.random.choice(range(60,120)),
+            'wind': np.random.choice(np.linspace(0,14,29))
+           }
     
     # add altitude, water vapor, ozone, wind (for sunglint) !!!!!
     
     iops['Atm'] = atm
+
+############### SAVE ###########################################################
+#%
+    cols, row = dict_to_df(iops)
     
-    return iops
+    return iops, cols, row

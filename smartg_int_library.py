@@ -17,6 +17,41 @@ from smartg.tools.phase import integ_phase, calc_iphase
 WAV = np.linspace(400, 900., num=201, dtype=np.float32)
 WAV_CDOM = np.arange(240., 900., 2.5, dtype=np.float32)
 
+def read_awbw(dir_aux,WAV):
+    from os.path import realpath, dirname, join
+    from scipy.interpolate import griddata
+    '''
+    Read pure water absorption from pope&fry, 97 (<700nm)
+    and palmer&williams, 74 (>700nm)
+    '''
+
+    # Pope&Fry
+    with open(join(dir_aux, 'water','data', 'pope97.dat'), 'rb') as fp:
+        for i in range(6): fp.readline()  # skip the first 6 lines
+        data_pf = np.genfromtxt(fp)
+    aw_pf = data_pf[:,1] * 100 #  convert from cm-1 to m-1
+    lam_pf = data_pf[:,0]
+    ok_pf = lam_pf <= 725
+
+    # Palmer&Williams
+    data_pw = np.genfromtxt(join(dir_aux, 'water', 'data','palmer74.dat'), skip_header=5)
+    aw_pw = data_pw[::-1,1] * 100 #  convert from cm-1 to m-1
+    lam_pw = data_pw[::-1,0]
+    ok_pw = lam_pw > 725
+
+    # aw = LUT(
+    #         np.array(list(aw_pf[ok_pf]) + list(aw_pw[ok_pw])),
+    #         axes=[np.array(list(lam_pf[ok_pf]) + list(lam_pw[ok_pw]))]
+    #         )
+    
+    aw = np.array(list(aw_pf[ok_pf]) + list(aw_pw[ok_pw]))
+    l = [np.array(list(lam_pf[ok_pf]) + list(lam_pw[ok_pw]))]
+    
+    awi = griddata(l[0], aw, WAV)
+    bwi = 19.3e-4*((WAV[:]/550.)**-4.3)
+    
+    return awi, bwi
+
 class Albedo_speclib2(object):
     '''
     Albedo from speclib
