@@ -85,10 +85,10 @@ INFO = False
 #----------------------------- START BUILDING ---------------------------------#
 
 # Case
-sname_title = 'case2PBStest'
+sname_title = 'case2PBStest100'
 
 # how many runs to build
-runs = 10
+runs = 100
 
 # lambda
 # l = np.arange(400, 902.5, 2.5)  
