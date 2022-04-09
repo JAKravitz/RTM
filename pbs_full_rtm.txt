@@ -1,0 +1,24 @@
+#PBS -S /bin/bash
+#PBS -l select=1:model=sky_gpu:mpiprocs=1:ncpus=36:ngpus=1:mem=300g 
+#PBS -q long
+#PBS -l walltime=30:00:00
+#PBS -j oe
+#PBS -N smartg_test
+
+cd $PBS_O_WORKDIR
+
+module purge
+
+# load the module and environment
+module -a use /swbuild/analytix/tools/modulefiles
+module load miniconda3/v4
+source activate smartg
+module load cuda/11.0
+
+# run python script
+python Full_RTM.py
+
+# deactivate environment
+conda deactivate
+
+# end of script
