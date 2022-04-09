@@ -2,7 +2,7 @@
 #PBS -l select=1:model=sky_gpu:mpiprocs=1:ncpus=36:ngpus=1:mem=300g 
 #PBS -l place=scatter:excl
 #PBS -q v100@pbspl4
-#PBS -l walltime=5:00:00
+#PBS -l walltime=15:00:00
 #PBS -j oe
 #PBS -N smartg_test
 
