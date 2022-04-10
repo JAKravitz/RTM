@@ -85,10 +85,10 @@ INFO = False
 #----------------------------- START BUILDING ---------------------------------#
 
 # Case
-sname_title = 'case2PBStest100'
+sname_title = 'case2PBStest25'
 
 # how many runs to build
-runs = 100
+runs = 25
 
 # lambda
 # l = np.arange(400, 902.5, 2.5)  
@@ -206,8 +206,8 @@ for k in range(runs):
                   pfwav=wav_vsf
                  ).calc(wav)
     
-    le  = {'th_deg':np.linspace(30,60,num=4), 'phi_deg':np.linspace(0,360,num=12)}
-    alis=False
+    le  = {'th_deg':np.linspace(30,60,num=3), 'phi_deg':np.linspace(0,360,num=9)}
+    alis=True
     alis_options={'nlow':-1} if alis else None
 
     mB =Smartg(device=0, back=True, alt_pp=False, alis=alis).run(wl=wav, water=water, 
@@ -217,8 +217,8 @@ for k in range(runs):
     
     iup = mB[0]
     iup0 = mB[20]
-    za = np.linspace(30,60,num=4)
-    aa = np.linspace(0,360,num=12)
+    za = np.linspace(30,60,num=3)
+    aa = np.linspace(0,360,num=9)
     
     for k in range(len(za)):
         for j in range(len(aa)):
@@ -235,9 +235,10 @@ for k in range(runs):
                 boa_ref.append(iup0[i,j,k])
             toa.append(toa_ref)
             boa.append(boa_ref)
-    end = time.time()
-    np.append(row, end-start)
-    np.append(cols, 'time')
+end = time.time()
+tlen = end-start
+    # np.append(cols, 'time')
+    
 
 inputs = pd.DataFrame(inputs,columns=cols,index=snames)
 toa = pd.DataFrame(toa,columns=wav,index=snames)
@@ -249,8 +250,12 @@ if os.path.exists(outpath2):
     pass
 else:
     os.mkdir(outpath2)
-inputs.to_csv(outpath2+'{}_inputs.csv'.format(sname_title))
-toa.to_csv(outpath2+'{}_toa.csv'.format(sname_title))
-boa.to_csv(outpath2+'{}_boa.csv'.format(sname_title))
+inputs.to_csv(outpath2+'{}_inputs{}.csv'.format(sname_title, tlen))
+toa.to_csv(outpath2+'{}_toa.csv{}'.format(sname_title, tlen))
+boa.to_csv(outpath2+'{}_boa.csv{}'.format(sname_title, tlen))
               
 # print ('DONE!')
+
+#%%
+
+# inputs = pd.read_csv('/Users/jakravit/Desktop/RTM_outputs/case2PBStest/case2PBStest_toa.csv',index_col=0)
