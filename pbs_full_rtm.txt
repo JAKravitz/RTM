@@ -1,5 +1,5 @@
 #PBS -S /bin/bash
-#PBS -l select=4:model=sky_gpu:mpiprocs=1:ncpus=36:ngpus=4:mem=300g 
+#PBS -l select=1:model=sky_gpu:mpiprocs=1:ncpus=36:ngpus=1:mem=300g 
 #PBS -l place=scatter:excl
 #PBS -q v100@pbspl4
 #PBS -l walltime=20:00:00
