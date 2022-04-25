@@ -145,11 +145,11 @@ def build_Case2(phy_library, datamin, datadet, benthic_lib, adj_lib, aero_lib):
     
     # small water bodies
     wr = np.random.choice(np.arange(1,25,1))
-    dist = np.random.choice(np.arange(.1, 25/2, .2).astype(np.float16))
+    dist = np.random.choice(np.arange(.1, wr/2, .2))
     # water body radius (km)
     iops['Adjacency']['water_radius'] = wr
     # Distance to landline
-    iops['Adjacency']['dist'] = dist
+    iops['Adjacency']['dist'] = np.round(dist,2)
     
     
     

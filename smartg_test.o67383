@@ -1,0 +1,31 @@
+Job 67383.pbspl4.nas.nasa.gov started on Sun Apr 10 19:00:03 PDT 2022
+The job requested the following resources:
+    mem=300gb
+    ncpus=36
+    place=scatter:excl
+    walltime=20:00:00
+
+PBS set the following environment variables:
+        FORT_BUFFERED = 1
+                   TZ = PST8PDT
+
+On r101i0n0:
+Current directory is /nobackup/jakravit/git/RTM
+
+____________________________________________________________________
+Job Resource Usage Summary for 67383.pbspl4.nas.nasa.gov
+
+    CPU Time Used            : 16:12:47
+    Real Memory Used         : 72598976kb
+    Walltime Used            : 16:16:20
+    Exit Status              : 271
+
+    Memory Requested         : 300gb
+    Number of CPUs Requested : 36
+    Walltime Requested       : 20:00:00
+
+    Execution Queue          : v100
+    Charged To               : s1007
+
+    Job Stopped              : Mon Apr 11 11:16:30 2022
+____________________________________________________________________

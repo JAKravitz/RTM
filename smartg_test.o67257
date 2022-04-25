@@ -1,0 +1,32 @@
+Job 67257.pbspl4.nas.nasa.gov started on Sat Apr 09 18:03:46 PDT 2022
+The job requested the following resources:
+    mem=1200gb
+    ncpus=144
+    place=scatter:excl
+    walltime=20:00:00
+
+PBS set the following environment variables:
+        FORT_BUFFERED = 1
+                   TZ = PST8PDT
+
+On r101i0n4:
+Current directory is /nobackup/jakravit/git/RTM
+=>> PBS: job killed: walltime 72064 exceeded limit 72000
+
+____________________________________________________________________
+Job Resource Usage Summary for 67257.pbspl4.nas.nasa.gov
+
+    CPU Time Used            : 19:56:53
+    Real Memory Used         : 72702604kb
+    Walltime Used            : 20:01:14
+    Exit Status              : 271
+
+    Memory Requested         : 1200gb
+    Number of CPUs Requested : 144
+    Walltime Requested       : 20:00:00
+
+    Execution Queue          : v100
+    Charged To               : s1007
+
+    Job Stopped              : Sun Apr 10 14:05:18 2022
+____________________________________________________________________
