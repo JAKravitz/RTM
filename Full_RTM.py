@@ -88,7 +88,7 @@ INFO = False
 sname_title = 'case2PBStest10'
 
 # how many runs to build
-runs = 10
+runs = 3
 
 # lambda
 # l = np.arange(400, 902.5, 2.5)  
