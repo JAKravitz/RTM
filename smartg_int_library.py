@@ -208,7 +208,6 @@ def mix(runData):
     ac  = np.zeros_like(WAV)
     bp  = np.zeros_like(WAV)
     vsf = np.zeros((1,WAV.size,1801), dtype=np.float32)
-    angles = runData['VSF_angles']
     for key in runData.keys():
         comp = runData[key]
         if key in ['Phyto','Min','Det']:
@@ -217,7 +216,10 @@ def mix(runData):
             vsf+= comp['b_tot'][None,:,None] * comp['VSF_tot']
         elif key in ['CDOM']:
             ac += interp1d(WAV_CDOM, comp['a_tot'], kind='cubic', fill_value='extrapolate')(WAV)
-        # if 'VSF_angles' in comp.keys():
-        #     angles = comp['VSF_angles']
+        try:
+            angles = runData['VSF_angles']
+        except:
+            if 'VSF_angles' in comp.keys():
+                angles = comp['VSF_angles']
             
     return ap,ac,bp,vsf/bp[None,:,None],angles
