@@ -187,9 +187,79 @@ def define_case2_chlDist (phyto_class_frxn, maxpft):
     
     chl = round(np.random.choice(chlDist), 3)
     return chl
-            
+
 ##
-def phyto_iops (phyto_class_frxn, phy_library, classIOPs):            
+def phyto_iops_case1 (phyto_class_frxn, phy_library, classIOPs):            
+    l = np.arange(400, 902.5, 2.5)  
+    idx675 = np.where(l==675)[0]
+    idx620 = np.where(l==620)[0]
+    # pc_tot = []
+    for c, f in phyto_class_frxn.items():
+        classIOPs[c] = {}
+        
+        # class chl contribution
+        class_chl = f['cfrxn'] * classIOPs['TotChl']
+        classIOPs[c]['class_chl'] = class_chl
+        classIOPs[c]['class_frxn'] = f['cfrxn']
+        
+        for i, sp in enumerate(f['sps']):
+            classIOPs[c][sp] = {}
+            sims = phy_library[c][sp[:-2]]
+            sim_idx = np.random.choice(list(sims), 1)[0] 
+            info = sims[sim_idx]
+            idx = np.random.choice(len(info['astar']), 1) 
+            sfrxn = f['fx'][i] # species fraction
+            classIOPs[c][sp]['sp_frxn'] = sfrxn
+            deff = info['astar'].iloc[idx,:].index.values
+            sp_chl = class_chl * sfrxn
+            a = sp_chl * info['astar'].iloc[idx,:].values[0]
+            classIOPs[c][sp]['a'] = a
+            classIOPs[c][sp]['b'] = sp_chl * info['bstar'].iloc[idx,:].values[0]
+            classIOPs[c][sp]['c'] = sp_chl * info['cstar'].iloc[idx,:].values[0]
+            classIOPs[c][sp]['bb'] = sp_chl * info['bbstar'].iloc[idx,:].values[0]
+            classIOPs[c][sp]['VSF'] = sp_chl * info['VSF'][idx,:,:]
+            classIOPs[c][sp]['Deff'] = deff[0]
+            classIOPs[c][sp]['sp_chl_conc'] = sp_chl
+            for kk in ['ci','class','ncore','nshell','PFT1','PFT2','psdvol','size_class','Veff','Vs']:
+                classIOPs[c][sp][kk] = info[kk]
+            classIOPs[c][sp]['psdmax'] = info['psd'].max()           
+            
+        # phyto class tot IOPs
+        for p in ['a','b','c','bb','VSF']:
+            class_tot_iop = 0
+            for sp in f['sps']:
+                class_tot_iop = class_tot_iop + classIOPs[c][sp][p]
+            classIOPs[c]['{}_tot'.format(p)] = class_tot_iop
+                  
+        # phyto class size avg
+        class_tot_sz = []
+        for sp in f['sps']:
+            class_tot_sz.append(classIOPs[c][sp]['Deff'])        
+        cl_sz = np.mean(class_tot_sz)
+        classIOPs[c]['class_Deff'] = cl_sz
+        if cl_sz <= 2:
+            cl_sz_cl = 'pico'
+        elif 3 < cl_sz <= 6:
+            cl_sz_cl = 'small_nano'
+        elif 7 < cl_sz <= 11:
+            cl_sz_cl = 'med_nano'
+        elif 12 < cl_sz <= 20:
+            cl_sz_cl = 'large_nano'
+        elif cl_sz > 21:
+            cl_sz_cl = 'micro'
+        classIOPs[c]['class_sz_class'] = cl_sz_cl             
+            
+    # phyto component total iops
+    for p in ['a','b','c','bb','VSF']:
+        comp_tot_iop = 0
+        for c in phyto_class_frxn.keys():
+            comp_tot_iop = comp_tot_iop + classIOPs[c]['{}_tot'.format(p)]
+        classIOPs['{}_tot'.format(p)] = comp_tot_iop           
+
+    return classIOPs
+       
+##
+def phyto_iops_case2 (phyto_class_frxn, phy_library, classIOPs):            
     l = np.arange(400, 902.5, 2.5)  
     idx675 = np.where(l==675)[0]
     idx620 = np.where(l==620)[0]
@@ -279,7 +349,47 @@ def phyto_iops (phyto_class_frxn, phy_library, classIOPs):
     return classIOPs
 
 ##
-def min_iops (min_frxn, datamin, minIOPs):
+def min_iops_case1 (min_frxn, datamin, minIOPs):
+    l = np.arange(400, 902.5, 2.5)
+    idx700 = int(np.where(l==700)[0])
+    idx440 = int(np.where(l==440)[0])
+    for c, f in min_frxn.items():
+        minIOPs[c] = {}
+        sims = datamin[c[:-1]]
+        sim_idx = np.random.choice(list(sims.keys()))
+        info = sims[sim_idx]
+        cminl = (minIOPs['amin440'] * f) / info['astar'][0][idx440]
+        # cminl = minIOPs['Tot_conc'] * f
+        minIOPs[c]['class_frxn'] = f
+        minIOPs[c]['class_conc'] = cminl
+        astar = info['astar'][0]
+        minIOPs[c]['a'] = cminl * astar
+        minIOPs[c]['b'] = cminl * info['bstar'][0]
+        minIOPs[c]['bb'] = cminl * info['bbstar'][0]
+        minIOPs[c]['VSF'] = cminl * info['VSF'][0]
+        minIOPs[c]['class_slope'] = np.polyfit(l[:idx700], np.log(astar[:idx700]),1)[0]
+        for kk in ['j','nreal','rho']:
+            minIOPs[c][kk] = info[kk]
+        minIOPs[c]['psdmax'] = info['dmax']
+
+    # mineral component total iops
+    for p in ['a','b','bb','VSF']:
+        comp_tot_iop = 0 # iops
+        for c in min_frxn.keys():
+            comp_tot_iop = comp_tot_iop + minIOPs[c]['{}'.format(p)]
+            minIOPs['{}_tot'.format(p)] = comp_tot_iop
+            #comp_tot_C = comp_tot_C + minIOPs[c]['class_conc']
+    
+    # mineral component total conc
+    comp_tot_minl = 0
+    for c in min_frxn.keys():
+        comp_tot_minl = comp_tot_minl + minIOPs[c]['class_conc']
+    minIOPs['Tot_conc'] = comp_tot_minl
+    minIOPs['Tot_slope'] = np.polyfit(l[:idx700], np.log(minIOPs['a_tot'][:idx700]),1)[0]    
+    return minIOPs
+
+##
+def min_iops_case2 (min_frxn, datamin, minIOPs):
     l = np.arange(400, 902.5, 2.5)
     idx700 = int(np.where(l==700)[0])
     for c, f in min_frxn.items():
@@ -312,7 +422,27 @@ def min_iops (min_frxn, datamin, minIOPs):
     return minIOPs
 
 ##
-def det_iops (cdet, datadet, detIOPs):
+def det_iops_case1 (datadet, detIOPs):
+    l = np.arange(400, 902.5, 2.5)
+    idx440 = int(np.where(l==440)[0])
+    idx700 = int(np.where(l==700)[0])
+    sim_idx = np.random.choice(list(datadet.keys()))
+    info = datadet[sim_idx]
+    astar = info['astar'][0]
+    cdet = detIOPs['adet440'] / info['astar'][0][idx440]
+    detIOPs['Tot_conc'] = cdet
+    detIOPs['a_tot'] = cdet * astar
+    detIOPs['b_tot'] = cdet * info['bstar'][0]
+    detIOPs['bb_tot'] = cdet * info['bbstar'][0]
+    detIOPs['VSF_tot'] = cdet * info['VSF'][0]
+    detIOPs['Tot_slope'] = np.polyfit(l[:idx700], np.log(astar[:idx700]),1)[0]       
+    for kk in ['j','nreal','rho']:
+        detIOPs[kk] = info[kk]
+    detIOPs['psdmax'] = info['dmax']   
+    return detIOPs
+
+##
+def det_iops_case2 (cdet, datadet, detIOPs):
     l = np.arange(400, 902.5, 2.5)
     idx700 = int(np.where(l==700)[0])
     sim_idx = np.random.choice(list(datadet.keys()))
@@ -329,6 +459,7 @@ def det_iops (cdet, datadet, detIOPs):
         detIOPs[kk] = info[kk]
     detIOPs['psdmax'] = info['dmax']   
     return detIOPs
+
 
 ##
 def cdom_iops (ag440):
@@ -480,9 +611,12 @@ def dict_to_df (iops):
     classIOPs = iops['Phyto']
     for p in tots:
         if p in ['TotChl','TotPC']:
-            d = classIOPs[p]
-            row.append(d)
-            col_names.append(p)
+            try:
+                d = classIOPs[p]
+                row.append(d)
+                col_names.append(p)
+            except:
+                continue
         elif p in ['a_tot', 'b_tot', 'bb_tot']:
             d = classIOPs[p]
             row.append(d)
